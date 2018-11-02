@@ -8,6 +8,22 @@
 acs0	udata_acs   ; reserve data space in access ram
 counter	    res 1   ; reserve one byte for a counter variable
 delay_count res 1   ; reserve one byte for counter in the delay routine
+LP1	    res 1
+LP2	    res 1	    
+HP2	    res 1
+HP1	    res 1
+LOOW	    res 1
+MED	    res 1
+HGH	    res 1 
+v1	    res 1
+v2	    res 1
+v3	    res 1
+v4	    res 1
+	    
+
+	    
+	    
+ 
 
 tables	udata	0x400    ; reserve data anywhere in RAM (here at 0x400)
 myArray res 0x80    ; reserve 128 bytes for message data
@@ -21,6 +37,14 @@ myTable data	    "Hello World!\n"	; message, plus carriage return
 	constant    myTable_l=.13	; length of data
 	
 main	code
+	
+	
+    
+   
+    	    	
+	
+	
+
 	; ******* Programme FLASH read Setup Code ***********************
 setup	bcf	EECON1, CFGS	; point to Flash program memory  
 	bsf	EECON1, EEPGD 	; access Flash program memory
@@ -52,6 +76,27 @@ loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	lfsr	FSR2, myArray
 	call	UART_Transmit_Message
 	
+;************multiplier*************	
+addert  movlw   0x12
+	mulwf   ADRESL, ACCESS
+	movff   PRODL,  LP1
+	movff   PRODH,  HP1
+	movlw   0x12 
+	mulwf   ADRESH, ACCESS
+	movff   PRODL,  LP2
+	movff   PRODH,  HP2
+	movff   LP1, LOOW
+	movf    LP2, 0
+	addwf   HP1
+	movwf   MED
+	movlw   0x00
+	addwfc  HP2, 0
+	movwf   HIGH
+	movff   HIGH, v1
+	
+	
+	
+	
 measure_loop
 	call	ADC_Read
 	movf	ADRESH,W
@@ -59,10 +104,18 @@ measure_loop
 	movf	ADRESL,W
 	call	LCD_Write_Hex
 	goto	measure_loop		; goto current line in code
+	
+    
+
 
 	; a delay subroutine if you need one, times around loop in delay_count
 delay	decfsz	delay_count	; decrement until zero
 	bra delay
 	return
 
+	
+	
+	
+	
+	
 	end
